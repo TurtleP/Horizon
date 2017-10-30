@@ -40,3 +40,5 @@ love.window.setTitle("NINTENDO 3DS :: " .. love.filesystem.getIdentity():upper()
 if CONFIG.BOOT then
 	require(path .. ".boot")
 end
+
+require(path .. ".objects")

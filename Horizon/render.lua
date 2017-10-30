@@ -1,25 +1,13 @@
 local Screen = Enum.new({"top", "bottom"})
 local CURRENT_SCREEN = Screen.top
+local CURRENT_FONT = nil
+
+local SCISSOR = {
+	top = {0, 0, 400, 240},
+	bottom = {0, 0, 320, 240}
+}
 
 local IS_3D = false
-
-function love.graphics.set3D(enable) --stubbed
-	assert(type(enable) == "boolean")
-	IS_3D = enable
-end
-
-function love.graphics.setDepth(depth) --stubbed
-	assert(type(depth) == "number")
-end
-
-function love.graphics.setScreen(screen)
-	assert(Screen[screen] and type(screen) == "string")
-	CURRENT_SCREEN = Screen[screen]
-end
-
-function love.graphics.getScreen()
-	return CURRENT_SCREEN
-end
 
 local function translateCoordinates(x, y)
 	if not x then
@@ -38,14 +26,53 @@ local function translateCoordinates(x, y)
 	return x, y
 end
 
+function love.graphics.set3D(enable) --stubbed
+	assert(type(enable) == "boolean")
+	IS_3D = enable
+end
+
+function love.graphics.setDepth(depth) --stubbed
+	assert(type(depth) == "number")
+end
+
+local oldGraphicsScissor = love.graphics.setScissor
+function love.graphics.setScissor(x, y, width, height)
+	if x and y then
+		x, y = translateCoordinates(x, y)
+	end
+
+	oldGraphicsScissor(x, y, width, height)
+end
+
+function love.graphics.setScreen(screen)
+	assert(Screen[screen] and type(screen) == "string")
+	CURRENT_SCREEN = Screen[screen]
+
+	love.graphics.setScissor(unpack(SCISSOR[screen]))
+end
+
+function love.graphics.getScreen()
+	return CURRENT_SCREEN
+end
+
 local oldGraphicsDraw = love.graphics.draw
-function love.graphics.draw(image, quad, x, y,...)
-	x, y = translateCoordinates(x, y)
+function love.graphics.draw(image, ...) --image, x, y .. image, quad, x, y
+	local args = {...}
+
+	local offset = 1
+	local quad = nil
+
+	if type(args[2]) == "userdata" then
+		offset = 2
+		quad = args[2]
+	end
+
+	local x, y = translateCoordinates(args[offset + 0], args[offset + 1])
 
 	if not quad then
-		oldGraphicsDraw(image, x, y, ...)
+		oldGraphicsDraw(image, x, y, args[offset + 2], args[offset + 3], args[offset + 4], args[offset + 5], args[offset + 6])
 	else
-		oldGraphicsDraw(image, quad, x, y, ...)
+		oldGraphicsDraw(image, quad, x, y, args[offset + 2], args[offset + 3], args[offset + 4], args[offset + 5], args[offset + 6])
 	end
 end
 
@@ -71,11 +98,38 @@ function love.graphics.circle(mode, x, y, ...)
 	oldGraphicsCircle(mode, x, y, ...)
 end
 
+local oldGraphicsSetFont = love.graphics.setFont
+function love.graphics.setFont(font)
+	if type(font) == "userdata" then
+		oldGraphicsSetFont(font)
+		return
+	end
+
+	CURRENT_FONT = font
+end
+
 local oldGraphicsPrint = love.graphics.print
 function love.graphics.print(text, x, y, ...)
 	x, y = translateCoordinates(x, y)
 
-	oldGraphicsPrint(text, x, y, ...)
+	if not CURRENT_FONT then
+		oldGraphicsPrint(text, x, y, ...)
+		return
+	end
+
+	local font = CURRENT_FONT
+	local width = 0
+
+	for j = 1, #text do
+		for i = 1, #font.chars do
+			if text:sub(j, j) == font.chars[i].glyph and text:sub(j, j) ~= "\n" then
+				if j > 1 then
+					width = width + font.chars[i - 1].xadvance
+				end
+				oldGraphicsDraw(font.bitmap, font.chars[i].quad, x + width + font.chars[i].xoffset, y + font.chars[i].yoffset, ...)
+			end
+		end
+	end
 end
 
 local oldGraphicsGetWidth = love.graphics.getWidth
@@ -96,15 +150,17 @@ function love.graphics.getHeight()
 end
 
 local function renderSpace()
-	love.graphics.setColor(128, 128, 128)
+	love.graphics.setColor(66, 66, 66)
 
-	love.graphics.rectangle("fill", 0, 240, 40, 240)
-	love.graphics.rectangle("fill", 360, 240, 40, 240)
+	oldGraphicsRectangle("fill", 0, 240, 40, 240)
+	oldGraphicsRectangle("fill", 360, 240, 40, 240)
 end
 
 local oldDraw = love.draw
 function love.draw()
 	oldDraw()
+
+	love.graphics.setScissor()
 
 	renderSpace()
 

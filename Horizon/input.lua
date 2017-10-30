@@ -95,18 +95,17 @@ local oldMouseIsDown = love.mouse.isDown
 function love.mouse.isDown(button)
 	local x, y = love.mouse.getPosition()
 
-	if x > 0 and x <= 320 and y > 0 and y <= 240 then
-		return oldMouseIsDown(button)
+	if oldMouseIsDown(1) and x > 0 and x <= 320 and y > 0 and y <= 240 then
+		return true
 	end
+	return false
 end
 
 local oldMouseMoved = love.mousemoved
 function love.mousemoved(x, y, dx, dy)
 	local x, y = love.mouse.getPosition()
 	
-	x, y = clamp(0, x - 40, 320), clamp(0, y - 240, 240)
-
-	if oldMouseMoved and love.mouse.isDown(1) then
+	if oldMouseMoved and oldMouseIsDown(1) then
 		oldMouseMoved(x, y, dx, dy)
 	end
 end
