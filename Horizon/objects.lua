@@ -1,4 +1,4 @@
-local json = require('Horizon.json')
+local json = require('libraries.Horizon.json')
 
 local oldNewFont = love.graphics.newFont
 function love.graphics.newFont(path)
@@ -20,31 +20,32 @@ function love.graphics.newFont(path)
 	font.chars = {}
 
 	for k, v in pairs(font.glyphs.chars) do
-		table.insert(font.chars, 
-			{
-				glyph = k:char(), 
-				quad = love.graphics.newQuad(v.x, v.y, v.width, v.height, font.bitmap:getWidth(), font.bitmap:getHeight()), 
-				xadvance = v.xadvance, 
-				xoffset = v.xoffset, 
-				yoffset = v.yoffset, 
-				width = v.width, 
-				height = v.height
-			}
-		)
+		font.chars[k:char()] =
+		{
+			glyph = k:char(), 
+			quad = love.graphics.newQuad(v.x, v.y, v.width, v.height, font.bitmap:getWidth(), font.bitmap:getHeight()), 
+			xadvance = v.xadvance, 
+			xoffset = v.xoffset, 
+			yoffset = v.yoffset,
+		}
 	end
 
-	font.getHeight = function()
-		return font.glyphs.common.lineHeight
-	end
-
-	font.getWidth = function(text)
+	function font:getWidth(text)
 		local width = 0
 
+		text = tostring(text)
+
 		for i = 1, #text do
-			width = width + font.chars[i - 1].xadvance
+			if font.chars[text:sub(i, i)] then
+				width = width + font.chars[text:sub(i, i)].xadvance
+			end
 		end
 
 		return width
+	end
+
+	function font:getHeight()
+		return font.glyphs.common.lineHeight
 	end
 
 	return font

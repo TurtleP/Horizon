@@ -1,7 +1,7 @@
 local CONFIG = {}
 
 --Homebrew splash screen
-CONFIG.BOOT = true
+CONFIG.BOOT = false
 
 --Username
 CONFIG.USERNAME = "LOVE2D"

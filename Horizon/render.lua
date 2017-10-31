@@ -62,9 +62,9 @@ function love.graphics.draw(image, ...) --image, x, y .. image, quad, x, y
 	local offset = 1
 	local quad = nil
 
-	if type(args[2]) == "userdata" then
+	if type(args[1]) ~= "number" then
 		offset = 2
-		quad = args[2]
+		quad = args[1]
 	end
 
 	local x, y = translateCoordinates(args[offset + 0], args[offset + 1])
@@ -112,6 +112,8 @@ local oldGraphicsPrint = love.graphics.print
 function love.graphics.print(text, x, y, ...)
 	x, y = translateCoordinates(x, y)
 
+	text = tostring(text)
+
 	if not CURRENT_FONT then
 		oldGraphicsPrint(text, x, y, ...)
 		return
@@ -120,14 +122,13 @@ function love.graphics.print(text, x, y, ...)
 	local font = CURRENT_FONT
 	local width = 0
 
-	for j = 1, #text do
-		for i = 1, #font.chars do
-			if text:sub(j, j) == font.chars[i].glyph and text:sub(j, j) ~= "\n" then
-				if j > 1 then
-					width = width + font.chars[i - 1].xadvance
-				end
-				oldGraphicsDraw(font.bitmap, font.chars[i].quad, x + width + font.chars[i].xoffset, y + font.chars[i].yoffset, ...)
+	for i = 1, #text do
+		local glyph = font.chars[text:sub(i, i)]
+		if text:sub(i, i) ~= "\n" then
+			if i > 1 then
+				width = width + font:getWidth(text:sub(i - 1, i - 1))
 			end
+			oldGraphicsDraw(font.bitmap, glyph.quad, x + width + glyph.xoffset, y + glyph.yoffset, ...)
 		end
 	end
 end
@@ -150,7 +151,7 @@ function love.graphics.getHeight()
 end
 
 local function renderSpace()
-	love.graphics.setColor(66, 66, 66)
+	love.graphics.setColor(66, 66, 66, 255)
 
 	oldGraphicsRectangle("fill", 0, 240, 40, 240)
 	oldGraphicsRectangle("fill", 360, 240, 40, 240)

@@ -15,15 +15,20 @@
 
 	Horizön
 	3DS <-> PC Löve Bridge
-	v1.0
 --]]
 
+Horizon =
+{
+	_VERSION = "1.0.1",
+	RUNNING = (love.system.getOS() ~= "Horizon")
+}
+
 --SYSTEM CHECK
-if love.system.getOS() == "Horizon" then
+if not Horizon.RUNNING then
 	return
 end
 
-local _VERSION = 1.0
+Horizon.RUNNING = true
 
 local path = ...
 
