@@ -1,49 +1,49 @@
 --[[
-		             _                                  
-	              (`  ).                   _           
-	             (     ).              .:(`  )`.       
-	)           _(       '`.          :(   .    )      
-	        .=(`(      .   )     .--  `.  (    ) )      
-	       ((    (..__.:'-'   .+(   )   ` _`  ) )                 
-	`.     `(       ) )       (   .  )     (   )  ._   
-	  )      ` __.:'   )     (   (   ))     `-'.-(`  ) 
-	)  )  ( )       --'       `- __.'         :(      )) 
-	.-'  (_.'          .')                    `(    )  ))
-	                  (_  )                     ` __.:'          
-	                                        
-	--..,___.--,--'`,---..-.--+--.,,-,,..._.--..-._.-a:f--.
+                     _                                  
+                  (`  ).                   _           
+                 (     ).              .:(`  )`.       
+    )           _(       '`.          :(   .    )      
+            .=(`(      .   )     .--  `.  (    ) )      
+           ((    (..__.:'-'   .+(   )   ` _`  ) )                 
+    `.     `(       ) )       (   .  )     (   )  ._   
+      )      ` __.:'   )     (   (   ))     `-'.-(`  ) 
+    )  )  ( )       --'       `- __.'         :(      )) 
+    .-'  (_.'          .')                    `(    )  ))
+                      (_  )                     ` __.:'          
+                                            
+    --..,___.--,--'`,---..-.--+--.,,-,,..._.--..-._.-a:f--.
 
-	Horizön
-	3DS <-> PC Löve Bridge
+    Horizön
+    3DS <-> PC Löve Bridge
 --]]
 
 Horizon =
 {
-	_VERSION = "1.0.1",
-	RUNNING = (love.system.getOS() ~= "Horizon")
+    _VERSION = "1.0.1",
+    RUNNING = (love.system.getOS() ~= "Horizon")
 }
 
 --SYSTEM CHECK
 if not Horizon.RUNNING then
-	return
+    return
 end
 
 Horizon.RUNNING = true
 
-local path = ...
+local _PACKAGE = (...):match("^(.+)%.[^%.]+")
 
-Enum = require(path .. ".enum")
-CONFIG = require(path .. ".config")
+Enum = require(_PACKAGE .. ".enum")
+CONFIG = require(_PACKAGE .. ".config")
 
-require(path .. ".input")
-require(path .. ".render")
-require(path .. ".system")
+require(_PACKAGE .. ".input")
+require(_PACKAGE .. ".render")
+require(_PACKAGE .. ".system")
 
 love.window.setMode(400, 480, {vsync = true})
 love.window.setTitle("NINTENDO 3DS :: " .. love.filesystem.getIdentity():upper())
 
 if CONFIG.BOOT then
-	require(path .. ".boot")
+    require(_PACKAGE .. ".boot")
 end
 
-require(path .. ".objects")
+require(_PACKAGE .. ".objects")
