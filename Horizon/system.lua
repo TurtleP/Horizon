@@ -1,23 +1,23 @@
 function love.system.getOS()
-	return "Horizon"
+    return "Horizon"
 end
 
 function love.system.getModel()
-	return "O3DS"
+    return "O3DS"
 end
 
 function love.system.getProcessorCount()
-	return 2
+    return 2
 end
 
 function love.system.getRegion()
-	return "USA"
+    return "USA"
 end
 
 function love.system.getLanguage()
-	return "English"
+    return "English"
 end
 
 function love.system.getUsername()
-	return CONFIG.USERNAME
+    return CONFIG.USERNAME
 end
