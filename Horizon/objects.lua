@@ -7,9 +7,11 @@ function love.graphics.newFont(path)
         return oldNewFont(path)
     end
 
-    if not love.filesystem.isFile(path .. ".png") then
+    local pngInfo = love.filesystem.getInfo(path .. ".png")
+    local jsonInfo = love.filesystem.getInfo(path .. ".json")
+    if pngInfo.type ~= "file" then
         error("Missing " .. path .. ".png!")
-    elseif not love.filesystem.isFile(path .. ".json") then
+    elseif jsonInfo.type ~= "file" then
         error("Missing " .. path .. ".json!")
     end
 

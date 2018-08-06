@@ -30,7 +30,7 @@ end
 
 Horizon.RUNNING = true
 
-local _PACKAGE = (...):match("^(.+)%.[^%.]+")
+local _PACKAGE = ...
 
 Enum = require(_PACKAGE .. ".enum")
 CONFIG = require(_PACKAGE .. ".config")
